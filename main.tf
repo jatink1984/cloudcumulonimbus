@@ -399,7 +399,7 @@ resource "aws_elb" "wp_elb" {
     unhealthy_threshold = "${var.elb_unhealthy_threshold}"
     timeout = "${var.elb_timeout}"
     target = "TCP:80"
-    internal = "${var.elb_interval}"
+    interval = "${var.elb_interval}"
   }
 
   cross_zone_load_balancing = true
@@ -412,6 +412,25 @@ resource "aws_elb" "wp_elb" {
   }
 }
 
+#----- AMI for autoscaling group ----
+resource "random_id" "golden_ami" {
+  byte_length = 3
+}
+resource "aws_ami_from_instance" "wp_golden" {
+  name = "wp_ami-${random_id.golden_ami.b64}"
+  source_instance_id = "{aws_instance.wp_dev.id}"
+  
+  provisioner "local-exec"{
+    command = <<EOT
+    cat <<EOF > userdata
+    #!/bin/bash
+    /usr/bin/aws s3 sync s3://${aws_s3_bucket.code.bucket} /var/www/html/
+    /bin/touch /var/spool/cron/root
+    sudo /bin/echo '*/5 * * * * aws s3 sync s3://${aws_s3_bucket.code.bucket} /var/www/html' >> /var/spool/cron/root
+    EOF
+    EOT
+  }
+}
 
 
 
