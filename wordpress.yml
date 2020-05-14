@@ -1,0 +1,24 @@
+---
+- hosts: dev
+  become: yes
+  remote_user: ec2-user
+  tasks:
+    - name: install apache
+      yum: name={{ item }} state=present
+      with_items:
+        - httpd
+        - php
+        - php-mysql
+    - name: Download WordPress
+      get_url: url=http://worldpress.org/wordpress-latest.tar.gz dest=/var/html/wordpress.tar.gz force=yes
+    - name: Extract Wordpress
+      command: "tar xzf /var/www/html/worldpress.tar.gz -C /var/www/html --strip-components 1" 
+    - name: make diretory tree readable
+      file:
+        path: /var/www/html
+        mode: u=rwX,g=rX,p=rX
+        recurse: yes
+        owner: apache
+        group: apache
+    - name: Make sure Apache is up and running at boot
+      service: name=httpd state=started enabled=yes      
