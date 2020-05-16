@@ -10,7 +10,7 @@ cidrs       = {
   rds2     = "10.0.6.0/24"
   rds3     = "10.0.7.0/24"
 }
-localip = "18.219.128.252/32"
+localip = "3.14.71.94/32"
 domain_name = "cloudcumulonimbus"
 db_instance_class = "db.t2.micro"
 dbname = "tform_mysql"
