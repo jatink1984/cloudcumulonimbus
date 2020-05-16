@@ -36,7 +36,7 @@ resource "aws_iam_role" "s3_access_role" {
   name = "s3_access_role"
 
   assume_role_policy = <<HEREDOC
-  {
+{
     "Version": "2012-10-17",
     "Statement" : [
       {
@@ -48,7 +48,7 @@ resource "aws_iam_role" "s3_access_role" {
       "Sid": ""
       }
     ]
-  }
+}
   HEREDOC
 }
 
@@ -226,7 +226,7 @@ resource "aws_security_group" "wp_dev_sg" {
     from_port = 80
     to_port = 80
     protocol = "tcp"
-    cidr_blocks = ["${var.localip}"]
+    cidr_blocks = ["0.0.0.0/0"]
   }
   egress {
     from_port = 0
@@ -336,7 +336,7 @@ resource "aws_s3_bucket" "code" {
 resource "aws_db_instance" "wp_db" {
   allocated_storage = 10
   engine = "mysql"
-  engine_version = "5.6.27"
+  engine_version = "5.6.40"
   instance_class = "${var.db_instance_class}"
   name = "${var.dbname}"
   username = "${var.dbuser}"
@@ -367,15 +367,15 @@ resource "aws_instance" "wp_dev" {
   subnet_id = "${aws_subnet.wp_public1_subnet.id}"
   provisioner "local-exec" {
     command = <<EOD
-    cat <<EOF > aws_hosts
-    [dev]
-    ${aws_instance.wp_dev.public_ip}
-    [dev:vars]
-    s3code=${aws_s3_bucket.code.bucket}
-    domain=${var.domain_name}
-    EOF
-    EOD
-  }
+cat <<EOF > aws_hosts
+[dev]
+${aws_instance.wp_dev.public_ip}
+[dev:vars]
+s3code=${aws_s3_bucket.code.bucket}
+domain=${var.domain_name}
+EOF
+EOD
+}
   provisioner "local-exec" {
     command = "aws ec2 wait instance-status-ok --instance-ids ${aws_instance.wp_dev.id} --profile superhero && ansible-playbook -i aws_hosts wordpress.yml"
   }
@@ -418,7 +418,7 @@ resource "random_id" "golden_ami" {
 }
 resource "aws_ami_from_instance" "wp_golden" {
   name = "wp_ami-${random_id.golden_ami.b64}"
-  source_instance_id = "{aws_instance.wp_dev.id}"
+  source_instance_id = "${aws_instance.wp_dev.id}"
   
   provisioner "local-exec"{
     command = <<EOT
