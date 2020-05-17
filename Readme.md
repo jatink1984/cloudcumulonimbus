@@ -10,7 +10,7 @@ Application has 3 tier Architechture
 A load balancer is used to make application hosted by autoscaling group available to public users.
 
 Route53
-Has two hosted zones, public and private with same domain name
+Has two hosted zones, public and private zones.
 Public Hosted Zone
 -Has records for Development instance and the Load Balancer
 Private Hosted Zone
