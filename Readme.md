@@ -22,8 +22,7 @@ Bucket is used to host the application code. After any application code changes 
 ## &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp;Project Setup
 
 ## 1. Create Infrastructure
-To deploy the infrastructure use terraform apply command on the main.tf file &nbsp;
-```terraform apply ```
+Deploy the infrastructure using```terraform apply ```
 
 ## 2. Navigate to dev instance dev.cloudcumulonimbus.com. Update wordpress site URL to www.cloudcumulonimbus.com
 
