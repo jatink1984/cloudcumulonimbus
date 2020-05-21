@@ -10,7 +10,7 @@ cidrs       = {
   rds2     = "10.0.6.0/24"
   rds3     = "10.0.7.0/24"
 }
-localip = "3.14.71.94/32"
+localip = "18.216.129.121/32"
 domain_name = "cloudcumulonimbus"
 db_instance_class = "db.t2.micro"
 dbname = "tform_mysql"
@@ -31,3 +31,4 @@ asg_hct = "EC2"
 asg_cap = "2"
 lc_instance_type = "t2.micro"
 delegation_set = "N007101728YT8ZLBIPTOG"
+target_group_name = "app-tg"
