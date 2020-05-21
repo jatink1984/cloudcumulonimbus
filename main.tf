@@ -382,6 +382,7 @@ EOD
 }
 
 #-----Load Balancer-----
+/*
 resource "aws_elb" "wp_elb" {
   name = "${var.domain_name}-elb"
 
@@ -411,6 +412,74 @@ resource "aws_elb" "wp_elb" {
     Name = "wp_${var.domain_name}-elb"
   }
 }
+*/
+#------- Create ALB ------
+resource "aws_lb" "wp_alb" {
+  name = "${var.domain_name}-alb"
+  subnets = ["${aws_subnet.wp_public1_subnet.id}", "${aws_subnet.wp_public2_subnet.id}"]
+  security_groups = ["${aws_security_group.wp_public_sg.id}"]
+  internal = false
+  load_balancer_type = "application"
+  enable_deletion_protection = false
+  idle_timeout = 400
+  enable_cross_zone_load_balancing = true
+
+  tags {
+    Name = "wp_${var.domain_name}-alb"
+  }
+}
+
+resource "aws_lb_listener" "wp_listner" {
+  load_balancer_arn = "${aws_lb.wp_alb.arn}"
+  port = 80
+  protocol = "http"
+
+  default_action {
+    type = "forward"
+    target_group_arn = "${aws_lb_target_group.wp_tg.arn}"
+  }
+}
+
+resource "aws_alb_listener_rule" "wp_http_forward" {
+  depends_on   = ["aws_alb_target_group.wp_tg"]
+  listener_arn = "${aws_lb_listener.wp_listner.arn}"
+  action {
+    type = "forward"
+    target_group_arn = "${aws_lb_target_group.wp_tg.arn}"
+  }
+
+  condition {
+    field = "host-header"
+    values = ["*.cloudcumulonimbus.com"]
+
+  }
+}
+
+resource "aws_lb_target_group" "wp_tg" {
+  name     = "${var.target_group_name}"
+  port     = 80
+  protocol = "HTTP"
+  vpc_id   = "${aws_vpc.wp_vpc.id}"
+
+  tags {
+    name = "${var.target_group_name}"
+  }
+
+  health_check {
+    healthy_threshold   = "${var.elb_healthy_threshold}"
+    unhealthy_threshold = "${var.elb_unhealthy_threshold}"
+    timeout             = "${var.elb_timeout}"
+    interval            = 20
+    path                = "/"
+    port                = 80
+  }
+}
+
+resource "aws_autoscaling_attachment" "wp_asg_attachment" {
+  autoscaling_group_name = "${aws_autoscaling_group.wp_asg.id}"
+  alb_target_group_arn = "${aws_lb_target_group.wp_tg.arn}"
+}
+
 
 #----- AMI for autoscaling group ----
 resource "random_id" "golden_ami" {
