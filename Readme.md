@@ -3,7 +3,7 @@
 ![img-1](images/Architecture-Diagram.png)
 
 ## Overview
-Application has 3 tier Architechture
+Application Architechture
 1. Development Server  - Used to build the application. It is deployed in a public subnet.
 2. Application Tier - AutoScaling group instances that host the application. Autoscaling group instances are deployed in multi AZ 2 private subnets
 3. Database Tier - MySQL database with multi AZ deployment in private 3 subnets
